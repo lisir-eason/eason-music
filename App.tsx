@@ -27,6 +27,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import PizzaTranslator from '@/components/PizzaTranslator';
+
 const Section: React.FC<
   PropsWithChildren<{
     title: string;
@@ -66,6 +68,7 @@ const App = () => {
 
   return (
     <SafeAreaView style={backgroundStyle}>
+      <PizzaTranslator />
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
