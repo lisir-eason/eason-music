@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, SafeAreaView, Image, ScrollView} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../../App';
@@ -6,61 +6,31 @@ import {SearchBar} from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ButtonWithIcon from '@/components/ButtonWithIcon';
 import Playlist from '@/components/PlaylistItem';
+import {getRecommendedPlaylist} from '@/apis/playlist';
 
 type Props = NativeStackScreenProps<RootStackParamList, '音乐'>;
+import {PlayList} from '@/types';
 
 const HomeScreen = ({}: Props) => {
   const [search, setSearch] = useState<string>('');
+  const [songList, setSongList] = useState<[] | PlayList[]>([]);
   const updateSearch = (value: string) => {
     setSearch(value);
   };
-  const songList = [
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-    {
-      img: 'https://is5-ssl.mzstatic.com/image/thumb/Music69/v4/ae/fe/97/aefe975b-08f9-4bdb-d05a-491ade09a926/dj.emhqpwbp.jpg/1200x1200bf-60.jpg',
-      title: '热门歌曲影视推荐',
-      desc: '精选推荐',
-    },
-  ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getRecommendedPlaylist({limit: 9});
+        if (response.status === 200) {
+          setSongList(response.data.result as PlayList[]);
+        } else {
+          throw new Error('拉取推荐歌单失败');
+        }
+      } catch (error) {}
+    };
+    fetchData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

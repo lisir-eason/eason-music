@@ -1,33 +1,28 @@
 import {FC} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 
-type Song = {
-  img: string;
-  title: string;
-  desc: string;
-};
+import {PlayList} from '@/types';
 
 type Props = {
-  list: Song[];
+  list: PlayList[];
 };
 
 const Playlist: FC<Props> = ({list}: Props) => {
   return (
     <View style={styles.playListBox}>
-      {list.map((item, index) => (
-        <View style={styles.playListItem} key={index}>
+      {list.map(item => (
+        <View style={styles.playListItem} key={item.id}>
           <View style={styles.playListItemBackGround}>
             <Image
               style={styles.homeImage}
               source={{
-                uri: item.img,
+                uri: item.picUrl,
               }}
             />
           </View>
           <Text style={{marginTop: 10}} numberOfLines={1}>
-            {item.title}
+            {item.name}
           </Text>
-          <Text numberOfLines={1}>{item.desc}</Text>
         </View>
       ))}
     </View>
