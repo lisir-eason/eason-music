@@ -1,17 +1,23 @@
 import {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, SafeAreaView, Image, ScrollView} from 'react-native';
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../../App';
+import {RootStackParamList} from '@/types';
 import {SearchBar} from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ButtonWithIcon from '@/components/ButtonWithIcon';
-import Playlist from '@/components/PlaylistItem';
+import Playlist from '@/components/Playlist';
 import {getRecommendedPlaylist} from '@/apis/playlist';
 
-type Props = NativeStackScreenProps<RootStackParamList, '音乐'>;
-import {PlayList} from '@/types';
+import type {CompositeScreenProps} from '@react-navigation/native';
+import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {MainTabParamList, PlayList} from '@/types';
 
-const HomeScreen = ({}: Props) => {
+export type HomeScreenNavigationProp = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, '音乐'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+const HomeScreen = ({navigation}: HomeScreenNavigationProp) => {
   const [search, setSearch] = useState<string>('');
   const [songList, setSongList] = useState<[] | PlayList[]>([]);
   const updateSearch = (value: string) => {
@@ -27,7 +33,11 @@ const HomeScreen = ({}: Props) => {
         } else {
           throw new Error('拉取推荐歌单失败');
         }
-      } catch (error) {}
+      } catch (error) {
+        if (error) {
+          console.log(error);
+        }
+      }
     };
     fetchData();
   }, []);
@@ -67,7 +77,7 @@ const HomeScreen = ({}: Props) => {
             <Text style={{fontSize: 20, fontWeight: 'bold'}}>推荐歌单</Text>
             <Text>更多 {'>'}</Text>
           </View>
-          <Playlist list={songList} />
+          <Playlist list={songList} navigation={navigation} />
         </View>
       </ScrollView>
     </SafeAreaView>

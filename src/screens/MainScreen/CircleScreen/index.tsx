@@ -1,15 +1,15 @@
 import {View, Text} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from 'App';
+import {MainTabParamList} from '@/types';
 
-type Props = NativeStackScreenProps<RootStackParamList, '播放'>;
+type Props = NativeStackScreenProps<MainTabParamList, '咪咕圈'>;
 
-const PlayerScreen = ({}: Props) => {
+const CircleScreen = ({}: Props) => {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>PlayerScreen</Text>
+      <Text>MiGuScreen</Text>
     </View>
   );
 };
 
-export default PlayerScreen;
+export default CircleScreen;

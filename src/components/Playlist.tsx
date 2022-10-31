@@ -1,17 +1,23 @@
 import {FC} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, Pressable} from 'react-native';
 
 import {PlayList} from '@/types';
+import {HomeScreenNavigationProp} from '@/screens/MainScreen/HomeScreen';
 
 type Props = {
   list: PlayList[];
-};
+} & Pick<HomeScreenNavigationProp, 'navigation'>;
 
-const Playlist: FC<Props> = ({list}: Props) => {
+const Playlist: FC<Props> = ({list, navigation}: Props) => {
   return (
     <View style={styles.playListBox}>
       {list.map(item => (
-        <View style={styles.playListItem} key={item.id}>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Playlist', {id: item.id});
+          }}
+          style={styles.playListItem}
+          key={item.id}>
           <View style={styles.playListItemBackGround}>
             <Image
               style={styles.homeImage}
@@ -23,7 +29,7 @@ const Playlist: FC<Props> = ({list}: Props) => {
           <Text style={{marginTop: 10}} numberOfLines={1}>
             {item.name}
           </Text>
-        </View>
+        </Pressable>
       ))}
     </View>
   );

@@ -1,15 +1,15 @@
 import {View, Text} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from 'App';
+import {MainTabParamList} from '@/types';
 
-type Props = NativeStackScreenProps<RootStackParamList, '我的'>;
+type Props = NativeStackScreenProps<MainTabParamList, '播放'>;
 
-const MyScreen = ({}: Props) => {
+const PlayerScreen = ({}: Props) => {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>MyScreen</Text>
+      <Text>PlayerScreen</Text>
     </View>
   );
 };
 
-export default MyScreen;
+export default PlayerScreen;
