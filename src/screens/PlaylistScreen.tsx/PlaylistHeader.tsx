@@ -1,20 +1,15 @@
-import React from 'react';
+import React, {PropsWithChildren} from 'react';
 import {StyleSheet, Animated} from 'react-native';
 import {MAIN_COLOR} from '@/constants/color';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {AnimatedScroll} from '@/types';
 
-type Props = {
-  animHeaderValue: Animated.Value;
-  headerHeight: number;
-  maxHeaderHeight: number;
-  scrollDistance: number;
-};
+type Props = {} & AnimatedScroll & PropsWithChildren;
 
-const PlaylistHeader = ({
-  animHeaderValue,
-  headerHeight,
-  maxHeaderHeight,
-  scrollDistance,
-}: Props) => {
+const PlaylistHeader = ({animHeaderValue, maxHeaderHeight, children}: Props) => {
+  const headerHeight = useHeaderHeight();
+  const scrollDistance = maxHeaderHeight - headerHeight;
+
   const animatedHeaderHeight = animHeaderValue.interpolate({
     inputRange: [0, scrollDistance],
     outputRange: [maxHeaderHeight, headerHeight],
@@ -25,7 +20,7 @@ const PlaylistHeader = ({
 
   return (
     <Animated.View style={[styles.header, {height: animatedHeaderHeight}]}>
-      {/* <Text style={styles.headerText}></Text> */}
+      {children}
     </Animated.View>
   );
 };

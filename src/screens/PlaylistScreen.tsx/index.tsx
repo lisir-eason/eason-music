@@ -1,11 +1,10 @@
-import {useRef, useEffect} from 'react';
-import {View, Text, ScrollView, Animated, StyleSheet} from 'react-native';
-import {useHeaderHeight} from '@react-navigation/elements';
+import {useRef} from 'react';
+import {View, Text, Animated, StyleSheet} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import PlaylistHeader from './PlaylistHeader';
+import HeaderChangeScrollView from '@/components/HeaderChangeScrollView';
 import {AllNavigationProps} from '@/types';
-import {MAIN_COLOR} from '@/constants/color';
 
 const DATA = [
   {
@@ -64,50 +63,19 @@ const DATA = [
 
 type Props = NativeStackScreenProps<AllNavigationProps>;
 
-const PlaylistScreen = ({navigation}: Props) => {
+const PlaylistScreen = ({}: Props) => {
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
-  const headerHeight = useHeaderHeight();
   const Max_Header_Height = 200;
-  const Scroll_Distance = Max_Header_Height - headerHeight;
-
-  const headerOpacity = scrollOffsetY.interpolate({
-    inputRange: [0, Scroll_Distance],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerBackground: () => (
-        <Animated.View
-          style={{
-            backgroundColor: MAIN_COLOR,
-            ...StyleSheet.absoluteFillObject,
-            opacity: headerOpacity,
-            height: 140,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Text style={{fontSize: 17, fontWeight: '500', color: '#fff'}}>Playlist</Text>
-        </Animated.View>
-      ),
-      headerTransparent: true,
-    });
-  }, [headerOpacity, navigation]);
 
   return (
     <View style={{flex: 1}}>
-      <PlaylistHeader
-        animHeaderValue={scrollOffsetY}
-        headerHeight={headerHeight}
+      <PlaylistHeader animHeaderValue={scrollOffsetY} maxHeaderHeight={Max_Header_Height}>
+        <Text>hello</Text>
+      </PlaylistHeader>
+      <HeaderChangeScrollView
+        title="Playlist"
         maxHeaderHeight={Max_Header_Height}
-        scrollDistance={Scroll_Distance}
-      />
-      <ScrollView
-        scrollEventThrottle={16}
-        onScroll={Animated.event([{nativeEvent: {contentOffset: {y: scrollOffsetY}}}], {
-          useNativeDriver: false,
-        })}>
+        animHeaderValue={scrollOffsetY}>
         {DATA.map(book => {
           return (
             <Text style={styles.scrollText} key={book.id}>
@@ -115,7 +83,7 @@ const PlaylistScreen = ({navigation}: Props) => {
             </Text>
           );
         })}
-      </ScrollView>
+      </HeaderChangeScrollView>
     </View>
   );
 };
