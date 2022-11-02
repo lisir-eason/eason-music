@@ -1,23 +1,17 @@
 import {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, SafeAreaView, Image, ScrollView} from 'react-native';
-import {RootStackParamList} from '@/types';
 import {SearchBar} from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import ButtonWithIcon from '@/components/ButtonWithIcon';
 import Playlist from '@/components/Playlist';
 import {getRecommendedPlaylist} from '@/apis/playlist';
 
-import type {CompositeScreenProps} from '@react-navigation/native';
-import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainTabParamList, PlayList} from '@/types';
+import {PlayList, AllNavigationProps} from '@/types';
 
-export type HomeScreenNavigationProp = CompositeScreenProps<
-  BottomTabScreenProps<MainTabParamList, '音乐'>,
-  NativeStackScreenProps<RootStackParamList>
->;
+type Props = {} & AllNavigationProps;
 
-const HomeScreen = ({navigation}: HomeScreenNavigationProp) => {
+const HomeScreen = ({navigation}: Props) => {
   const [search, setSearch] = useState<string>('');
   const [songList, setSongList] = useState<[] | PlayList[]>([]);
   const updateSearch = (value: string) => {

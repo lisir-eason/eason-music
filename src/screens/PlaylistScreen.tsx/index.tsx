@@ -1,10 +1,10 @@
-import {FC, useRef, useEffect} from 'react';
+import {useRef, useEffect} from 'react';
 import {View, Text, ScrollView, Animated, StyleSheet} from 'react-native';
 import {useHeaderHeight} from '@react-navigation/elements';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import PlaylistHeader from './PlaylistHeader';
-import {RootStackParamList} from '@/types';
+import {AllNavigationProps} from '@/types';
 import {MAIN_COLOR} from '@/constants/color';
 
 const DATA = [
@@ -62,9 +62,9 @@ const DATA = [
   },
 ];
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Playlist'>;
+type Props = NativeStackScreenProps<AllNavigationProps>;
 
-const PlaylistScreen: FC<Props> = ({navigation}: Props) => {
+const PlaylistScreen = ({navigation}: Props) => {
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const headerHeight = useHeaderHeight();
   const Max_Header_Height = 200;

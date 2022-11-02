@@ -1,8 +1,8 @@
 import {View, Text} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainTabParamList} from '@/types';
+import {AllNavigationProps} from '@/types';
 
-type Props = NativeStackScreenProps<MainTabParamList, '我的'>;
+type Props = {} & NativeStackScreenProps<AllNavigationProps>;
 
 const MyScreen = ({}: Props) => {
   return (

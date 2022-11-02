@@ -1,12 +1,11 @@
 import {FC} from 'react';
 import {View, Text, StyleSheet, Image, Pressable} from 'react-native';
 
-import {PlayList} from '@/types';
-import {HomeScreenNavigationProp} from '@/screens/MainScreen/HomeScreen';
+import {PlayList, AllNavigationProps} from '@/types';
 
 type Props = {
   list: PlayList[];
-} & Pick<HomeScreenNavigationProp, 'navigation'>;
+} & Pick<AllNavigationProps, 'navigation'>;
 
 const Playlist: FC<Props> = ({list, navigation}: Props) => {
   return (

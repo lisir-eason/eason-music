@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React from 'react';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -10,7 +10,7 @@ import {RootStackParamList} from '@/types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const App: FC = () => {
+const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerTintColor: '#fff'}}>
