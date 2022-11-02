@@ -13,9 +13,16 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const App: FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Main" component={MainScreen} options={{title: '歌单'}} />
-        <Stack.Screen name="Playlist" component={PlaylistScreen} />
+      <Stack.Navigator screenOptions={{headerTintColor: '#fff'}}>
+        <Stack.Screen name="Main" component={MainScreen} options={{headerShown: false}} />
+        <Stack.Screen
+          name="Playlist"
+          component={PlaylistScreen}
+          options={{
+            headerBackTitleVisible: false,
+            headerTitle: '',
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,8 +1,8 @@
 import {FC} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import {MAIN_COLOR} from '@/constants/color';
 import HomeScreen from './HomeScreen';
 import SpotScreen from './SpotScreen';
 import PlayerScreen from './PlayerScreen';
@@ -12,7 +12,7 @@ import MyScreen from './MyScreen';
 import {MainTabParamList} from '@/types';
 
 const screenCommonOptions = {
-  tabBarActiveTintColor: '#FC69A3',
+  tabBarActiveTintColor: MAIN_COLOR,
   tabBarInactiveTintColor: 'gray',
   headerShown: false,
 };
