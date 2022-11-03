@@ -16,8 +16,6 @@ const PlaylistHeader = ({animHeaderValue, maxHeaderHeight, children}: Props) => 
     extrapolate: 'clamp',
   });
 
-  console.log(headerHeight);
-
   return (
     <Animated.View style={[styles.header, {height: animatedHeaderHeight}]}>
       {children}

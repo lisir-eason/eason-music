@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const baseUrl = 'https://musicapi-d6wlaf5h9-liqiangnd.vercel.app';
+//vercel
+// const baseUrl = 'https://musicapi-d6wlaf5h9-liqiangnd.vercel.app';
+//nd
+const baseUrl = 'http://192.168.214.50:3000';
 
 const api = axios.create({
   withCredentials: true,

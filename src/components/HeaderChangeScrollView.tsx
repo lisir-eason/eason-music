@@ -5,7 +5,7 @@ import {useHeaderHeight} from '@react-navigation/elements';
 import {MAIN_COLOR} from '@/constants/color';
 import {AnimatedScroll} from '@/types';
 
-type Props = {title: string} & PropsWithChildren & AnimatedScroll;
+type Props = {title: string | undefined} & PropsWithChildren & AnimatedScroll;
 
 const HeaderChangeScrollView = ({title, children, animHeaderValue, maxHeaderHeight}: Props) => {
   const headerHeight = useHeaderHeight();
@@ -30,7 +30,9 @@ const HeaderChangeScrollView = ({title, children, animHeaderValue, maxHeaderHeig
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Text style={{fontSize: 17, fontWeight: '500', color: '#fff'}}>{title}</Text>
+          <Text numberOfLines={1} style={{fontSize: 17, fontWeight: '500', color: '#fff'}}>
+            {title}
+          </Text>
         </Animated.View>
       ),
       headerTransparent: true,

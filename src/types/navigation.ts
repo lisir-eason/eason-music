@@ -12,7 +12,7 @@ export type mainTabParamList = {
 
 export type rootStackParamList = {
   Main: NavigatorScreenParams<mainTabParamList>;
-  Playlist: {id: number};
+  Playlist: {id: string};
 };
 
 export type allNavigationProps = CompositeScreenProps<

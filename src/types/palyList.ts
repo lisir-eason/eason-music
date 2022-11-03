@@ -1,5 +1,5 @@
 export type playList = {
-  id: number;
+  id: string;
   name: string;
   picUrl: string;
   playCount: number;
