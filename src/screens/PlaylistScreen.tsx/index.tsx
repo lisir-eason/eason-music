@@ -1,13 +1,15 @@
 import {useRef, useEffect, useState} from 'react';
-import {View, Text, Animated, StyleSheet, Image} from 'react-native';
+import {View, Text, Animated, StyleSheet, Image, Pressable} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import TrackPlayer from 'react-native-track-player';
 
 import HeaderChangeScrollView from '@/components/HeaderChangeScrollView';
 import {PlaylistInfoBox, ListContainer} from '@/components/StyledContainer';
 import {H2, H3} from '@/components/StyledComponent';
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
-import {RootStackParamList} from '@/types';
+import {RootStackParamList, SongUrl} from '@/types';
 import {getPlaylistDetail} from '@/apis/playlist';
+import {getSongUrls} from '@/apis/song';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Playlist'>;
 
@@ -16,6 +18,7 @@ type Author = {
   name: string;
 };
 type trackProps = {
+  id: number;
   name: string;
   al: {name: string; id: number; picUrl: string};
   ar: Author[];
@@ -39,16 +42,42 @@ const PlaylistScreen = ({route}: Props) => {
       getPlaylistDetail({id}).then(res => {
         if (res) {
           const {playlist} = res.data;
-
           setPlaylistInfo(playlist);
         }
       });
     }
   }, [id]);
 
+  const handlePlay = async () => {
+    const tracks = playlistInfo?.tracks;
+    if (tracks) {
+      try {
+        const tracksId = tracks.map(item => item.id).join(',');
+        const {data: urls} = await getSongUrls({id: tracksId, level: 'standard'});
+        const data = urls.data as SongUrl[];
+        const songTracks = data.map(item => {
+          return {
+            url: item.url.replace('http', 'https'),
+            title: tracks.find(el => el.id === item.id)?.name,
+            duration: item.time / 1000,
+            artist: tracks
+              .find(el => el.id === item.id)
+              ?.ar.map(e => e.name)
+              ?.join(','),
+            artwork: tracks.find(el => el.id === item.id)?.al.picUrl.replace('http', 'https'),
+          };
+        });
+        await TrackPlayer.add(songTracks);
+        // await TrackPlayer.play();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   const renderItem = playlistInfo?.tracks.map((item: trackProps, index: number) => {
     return (
-      <View style={styles.playlistItemContainer} key={index}>
+      <Pressable style={styles.playlistItemContainer} key={index} onPress={handlePlay}>
         <View style={styles.playlistItemIndexContainer}>
           <Text style={{fontSize: 16}}>{index + 1}</Text>
         </View>
@@ -67,7 +96,7 @@ const PlaylistScreen = ({route}: Props) => {
         <ClickButtonWithIcon color="#888888" size={23} icon="play-circle-outline" />
         <ClickButtonWithIcon color="#888888" size={23} icon="add-circle-outline" />
         <ClickButtonWithIcon color="#888888" size={23} icon="ellipsis-vertical-circle-outline" />
-      </View>
+      </Pressable>
     );
   });
 
