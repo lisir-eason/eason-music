@@ -5,7 +5,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {MAIN_COLOR} from '@/constants/color';
 import HomeScreen from './HomeScreen';
 import SpotScreen from './SpotScreen';
-import PlayerScreen from './PlayerScreen';
 import CircleScreen from './CircleScreen';
 import MyScreen from './MyScreen';
 
@@ -44,18 +43,6 @@ const MainScreen: FC = () => {
           ...screenCommonOptions,
         })}
       />
-      <Tab.Screen
-        name="播放"
-        component={PlayerScreen}
-        options={({}) => ({
-          tabBarIcon: ({focused, color, size}) => {
-            const iconName = focused ? 'play-circle' : 'play-circle-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          ...screenCommonOptions,
-        })}
-      />
-
       <Tab.Screen
         name="咪咕圈"
         component={CircleScreen}

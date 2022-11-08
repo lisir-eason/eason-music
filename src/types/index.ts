@@ -1,5 +1,5 @@
 import {playList} from './palyList';
-import {mainTabParamList, rootStackParamList, allNavigationProps} from './navigation';
+import {mainTabParamList, rootStackParamList, allNavigationProps, tracks} from './navigation';
 import {animatedScroll} from './animatedScroll';
 import {songLevel, songUrl} from './song';
 
@@ -10,3 +10,4 @@ export type AllNavigationProps = allNavigationProps;
 export type AnimatedScroll = animatedScroll;
 export type SongLevel = songLevel;
 export type SongUrl = songUrl;
+export type Tracks = tracks;

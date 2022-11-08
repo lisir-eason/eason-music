@@ -1,7 +1,6 @@
 import {useRef, useEffect, useState} from 'react';
 import {View, Text, Animated, StyleSheet, Image, Pressable} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import TrackPlayer from 'react-native-track-player';
 
 import HeaderChangeScrollView from '@/components/HeaderChangeScrollView';
 import {PlaylistInfoBox, ListContainer} from '@/components/StyledContainer';
@@ -10,6 +9,7 @@ import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
 import {RootStackParamList, SongUrl} from '@/types';
 import {getPlaylistDetail} from '@/apis/playlist';
 import {getSongUrls} from '@/apis/song';
+import {ICON_GRAY} from '@/constants/color';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Playlist'>;
 
@@ -31,7 +31,7 @@ type PlaylistInfoProps = null | {
   tracks: trackProps[];
 };
 
-const PlaylistScreen = ({route}: Props) => {
+const PlaylistScreen = ({route, navigation}: Props) => {
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const [playlistInfo, setPlaylistInfo] = useState<PlaylistInfoProps>(null);
   const Max_Header_Height = 250;
@@ -48,7 +48,7 @@ const PlaylistScreen = ({route}: Props) => {
     }
   }, [id]);
 
-  const handlePlay = async () => {
+  const handlePlay = async (track: trackProps) => {
     const tracks = playlistInfo?.tracks;
     if (tracks) {
       try {
@@ -57,7 +57,8 @@ const PlaylistScreen = ({route}: Props) => {
         const data = urls.data as SongUrl[];
         const songTracks = data.map(item => {
           return {
-            url: item.url.replace('http', 'https'),
+            id: item.id,
+            url: item.url && item.url.replace('http', 'https'),
             title: tracks.find(el => el.id === item.id)?.name,
             duration: item.time / 1000,
             artist: tracks
@@ -67,8 +68,8 @@ const PlaylistScreen = ({route}: Props) => {
             artwork: tracks.find(el => el.id === item.id)?.al.picUrl.replace('http', 'https'),
           };
         });
-        await TrackPlayer.add(songTracks);
         // await TrackPlayer.play();
+        navigation.navigate('Player', {id: track.id, tracks: songTracks});
       } catch (error) {
         console.log(error);
       }
@@ -77,7 +78,7 @@ const PlaylistScreen = ({route}: Props) => {
 
   const renderItem = playlistInfo?.tracks.map((item: trackProps, index: number) => {
     return (
-      <Pressable style={styles.playlistItemContainer} key={index} onPress={handlePlay}>
+      <Pressable style={styles.playlistItemContainer} key={index} onPress={() => handlePlay(item)}>
         <View style={styles.playlistItemIndexContainer}>
           <Text style={{fontSize: 16}}>{index + 1}</Text>
         </View>
@@ -93,9 +94,24 @@ const PlaylistScreen = ({route}: Props) => {
             {item.ar.map(ar => ar.name).join('·')}
           </Text>
         </View>
-        <ClickButtonWithIcon color="#888888" size={23} icon="play-circle-outline" />
-        <ClickButtonWithIcon color="#888888" size={23} icon="add-circle-outline" />
-        <ClickButtonWithIcon color="#888888" size={23} icon="ellipsis-vertical-circle-outline" />
+        <ClickButtonWithIcon
+          color={ICON_GRAY}
+          size={23}
+          icon="play-circle-outline"
+          onPress={() => {}}
+        />
+        <ClickButtonWithIcon
+          color={ICON_GRAY}
+          size={23}
+          icon="add-circle-outline"
+          onPress={() => {}}
+        />
+        <ClickButtonWithIcon
+          color={ICON_GRAY}
+          size={23}
+          icon="ellipsis-vertical-circle-outline"
+          onPress={() => {}}
+        />
       </Pressable>
     );
   });

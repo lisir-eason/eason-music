@@ -1,18 +1,19 @@
 import {FC} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {Pressable, StyleSheet} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type Props = {
   size: number;
   icon: string;
   color: string;
+  onPress: () => void;
 };
 
-const ClickButtonWithIcon: FC<Props> = ({size, icon, color}: Props) => {
+const ClickButtonWithIcon: FC<Props> = ({size, icon, color, onPress}: Props) => {
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={onPress}>
       <Ionicons name={icon} size={size} color={color} />
-    </View>
+    </Pressable>
   );
 };
 

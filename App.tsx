@@ -5,7 +5,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TrackPlayer from 'react-native-track-player';
 
 import MainScreen from '@/screens/MainScreen';
-import PlaylistScreen from '@/screens/PlaylistScreen.tsx';
+import PlaylistScreen from '@/screens/PlaylistScreen';
+import PlayerScreen from '@/screens/PlayerScreen';
 import {trackPlayerServices} from './service';
 
 import {RootStackParamList} from '@/types';
@@ -20,10 +21,6 @@ const App = () => {
       });
 
       TrackPlayer.registerPlaybackService(() => trackPlayerServices);
-
-      // await TrackPlayer.add([track]);
-
-      // await TrackPlayer.play();
     })();
   }, []);
 
@@ -37,6 +34,13 @@ const App = () => {
           options={{
             headerBackTitleVisible: false,
             headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="Player"
+          component={PlayerScreen}
+          options={{
+            headerShown: false,
           }}
         />
       </Stack.Navigator>
