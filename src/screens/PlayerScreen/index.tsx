@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {View, Text, SafeAreaView, Image, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
 import TrackPlayer, {
   type Track,
@@ -8,7 +8,7 @@ import TrackPlayer, {
   State,
   useProgress,
 } from 'react-native-track-player';
-import {LinearProgress, BottomSheet, ListItem} from '@rneui/themed';
+import {LinearProgress, BottomSheet, ListItem, Image} from '@rneui/themed';
 import {BlurView} from '@react-native-community/blur';
 
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';

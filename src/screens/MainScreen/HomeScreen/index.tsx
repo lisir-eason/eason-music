@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, SafeAreaView, Image, ScrollView} from 'react-native';
-import {SearchBar} from '@rneui/themed';
+import {View, Text, StyleSheet, SafeAreaView, ScrollView} from 'react-native';
+import {SearchBar, Image} from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import ButtonWithIcon from '@/components/ButtonWithIcon';

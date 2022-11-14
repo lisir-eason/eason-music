@@ -1,6 +1,7 @@
 import {useRef, useEffect, useState} from 'react';
-import {View, Text, Animated, StyleSheet, Image, Pressable} from 'react-native';
+import {View, Text, Animated, StyleSheet, Pressable} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {Image} from '@rneui/themed';
 
 import HeaderChangeScrollView from '@/components/HeaderChangeScrollView';
 import {PlaylistInfoBox, ListContainer} from '@/components/StyledContainer';
@@ -10,6 +11,7 @@ import {RootStackParamList, SongUrl} from '@/types';
 import {getPlaylistDetail} from '@/apis/playlist';
 import {getSongUrls} from '@/apis/song';
 import {ICON_GRAY} from '@/constants/color';
+import SkeletonWithLinear from '@/components/SkeletonWithLinear';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Playlist'>;
 
@@ -79,6 +81,27 @@ const PlaylistScreen = ({route, navigation}: Props) => {
     }
   };
 
+  const renderSkeleton = () => {
+    const skeletons = [];
+    for (let i = 0; i < 10; i++) {
+      skeletons.push(
+        <View style={styles.playlistItemContainer} key={i}>
+          <SkeletonWithLinear style={{height: 32, flex: 1, marginRight: 10}} />
+          <SkeletonWithLinear width={32} height={32} circle />
+          <SkeletonWithLinear
+            style={{marginLeft: 10, marginRight: 10}}
+            width={32}
+            height={32}
+            circle
+          />
+          <SkeletonWithLinear width={32} height={32} circle />
+        </View>,
+      );
+    }
+
+    return skeletons;
+  };
+
   const renderItem = playlistInfo?.tracks.map((item: trackProps, index: number) => {
     return (
       <Pressable style={styles.playlistItemContainer} key={index} onPress={() => handlePlay(item)}>
@@ -127,18 +150,22 @@ const PlaylistScreen = ({route, navigation}: Props) => {
         animHeaderValue={scrollOffsetY}>
         <>
           <PlaylistInfoBox>
-            <View style={styles.leftInfoContainer}>
-              <H2 numberOfLines={1}>{playlistInfo?.updateFrequency || '每周更新'}</H2>
-              <H3 numberOfLines={1}>{playlistInfo?.name}</H3>
-              <Text style={{color: '#fff'}} numberOfLines={3}>
-                {playlistInfo?.description}
-              </Text>
-            </View>
+            {playlistInfo?.tracks.length ? (
+              <View style={styles.leftInfoContainer}>
+                <H2 numberOfLines={1}>{playlistInfo?.updateFrequency || '每周更新'}</H2>
+                <H3 numberOfLines={1}>{playlistInfo?.name}</H3>
+                <Text style={{color: '#fff'}} numberOfLines={3}>
+                  {playlistInfo?.description}
+                </Text>
+              </View>
+            ) : (
+              <SkeletonWithLinear style={styles.leftInfoContainer} height={130} />
+            )}
             <Image style={styles.playlistCoverImage} source={{uri: playlistInfo?.coverImgUrl}} />
           </PlaylistInfoBox>
           <ListContainer style={{marginTop: 290}}>
             {/* <FlatList data={playlistInfo?.tracks} renderItem={renderItem} /> */}
-            {renderItem}
+            {playlistInfo?.tracks.length ? renderItem : renderSkeleton()}
           </ListContainer>
         </>
       </HeaderChangeScrollView>
@@ -151,7 +178,10 @@ export default PlaylistScreen;
 const styles = StyleSheet.create({
   scrollText: {padding: 30},
   leftInfoContainer: {
+    marginRight: 20,
     flex: 1,
+    height: 130,
+    justifyContent: 'center',
   },
   playlistCoverImage: {
     width: 130,
