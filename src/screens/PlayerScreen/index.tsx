@@ -22,7 +22,7 @@ type Props = {} & NativeStackScreenProps<RootStackParamList, 'Player'>;
 
 const events = [Event.PlaybackState, Event.PlaybackError, Event.PlaybackTrackChanged];
 
-const PlayerScreen = ({route}: Props) => {
+const PlayerScreen = ({route, navigation}: Props) => {
   const {id, tracks} = route.params;
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [playerState, setPlayerState] = useState<State | null>(null);
@@ -125,7 +125,9 @@ const PlayerScreen = ({route}: Props) => {
           size={30}
           icon="chevron-down-outline"
           color={ICON_GRAY}
-          onPress={() => {}}
+          onPress={() => {
+            navigation.goBack();
+          }}
         />
         <ClickButtonWithIcon
           size={30}
@@ -227,7 +229,6 @@ const PlayerScreen = ({route}: Props) => {
       <BottomSheet
         modalProps={{}}
         isVisible={playlistVisible}
-        // containerStyle={{height: 200, backgroundColor: 'red'}}
         onBackdropPress={() => setPlaylistVisible(false)}>
         <BlurView
           blurType="dark"

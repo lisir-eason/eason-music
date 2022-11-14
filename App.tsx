@@ -41,6 +41,7 @@ const App = () => {
           component={PlayerScreen}
           options={{
             headerShown: false,
+            gestureDirection: 'vertical',
           }}
         />
       </Stack.Navigator>
