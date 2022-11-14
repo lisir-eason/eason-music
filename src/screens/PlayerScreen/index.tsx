@@ -32,15 +32,19 @@ const PlayerScreen = ({route, navigation}: Props) => {
   useEffect(() => {
     (async () => {
       if (id && tracks.length) {
-        await TrackPlayer.reset();
-        await TrackPlayer.add(tracks);
-        const index = tracks.findIndex(item => item.id === id);
-        await TrackPlayer.skip(index);
-        const nowTrack = await TrackPlayer.getTrack(index);
-        await TrackPlayer.play();
-        const queue = await TrackPlayer.getQueue();
-        setCurrentQueue(queue);
-        setCurrentTrack(nowTrack);
+        try {
+          await TrackPlayer.reset();
+          await TrackPlayer.add(tracks);
+          const index = tracks.findIndex(item => item.id === id) || 0;
+          await TrackPlayer.skip(index);
+          const nowTrack = await TrackPlayer.getTrack(index);
+          await TrackPlayer.play();
+          const queue = await TrackPlayer.getQueue();
+          setCurrentQueue(queue);
+          setCurrentTrack(nowTrack);
+        } catch (error) {
+          console.error(error);
+        }
       }
     })();
   }, [id, tracks]);

@@ -55,23 +55,26 @@ const PlaylistScreen = ({route, navigation}: Props) => {
         const tracksId = tracks.map(item => item.id).join(',');
         const {data: urls} = await getSongUrls({id: tracksId, level: 'standard'});
         const data = urls.data as SongUrl[];
-        const songTracks = data.map(item => {
-          return {
-            id: item.id,
-            url: item.url && item.url.replace('http', 'https'),
-            title: tracks.find(el => el.id === item.id)?.name,
-            duration: item.time / 1000,
-            artist: tracks
-              .find(el => el.id === item.id)
-              ?.ar.map(e => e.name)
-              ?.join(','),
-            artwork: tracks.find(el => el.id === item.id)?.al.picUrl.replace('http', 'https'),
-          };
-        });
-        // await TrackPlayer.play();
+        const songTracks = data
+          .map(item => {
+            return {
+              id: item.id,
+              url: (item.url && item.url.replace('http', 'https')) || '',
+              title: tracks.find(el => el.id === item.id)?.name,
+              duration: item.time / 1000,
+              artist: tracks
+                .find(el => el.id === item.id)
+                ?.ar.map(e => e.name)
+                ?.join(','),
+              artwork: tracks.find(el => el.id === item.id)?.al.picUrl.replace('http', 'https'),
+            };
+          })
+          .filter(el => el.url);
+
+        console.log(songTracks);
         navigation.navigate('Player', {id: track.id, tracks: songTracks});
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   };
