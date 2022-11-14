@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 //vercel
-const baseUrl = 'https://musicapi-d6wlaf5h9-liqiangnd.vercel.app';
+// const baseUrl = 'https://musicapi-d6wlaf5h9-liqiangnd.vercel.app';
 //nd
 // const baseUrl = 'http://192.168.214.50:3000';
+//local
+const baseUrl = 'https://lisireason.one/api-music';
 
 const api = axios.create({
   withCredentials: true,
