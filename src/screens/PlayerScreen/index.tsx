@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {View, Text, SafeAreaView, Image} from 'react-native';
+import {View, Text, SafeAreaView, Image, StyleSheet, ScrollView} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
 import TrackPlayer, {
   type Track,
@@ -8,11 +8,13 @@ import TrackPlayer, {
   State,
   useProgress,
 } from 'react-native-track-player';
-import {LinearProgress} from '@rneui/themed';
+import {LinearProgress, BottomSheet, ListItem} from '@rneui/themed';
+import {BlurView} from '@react-native-community/blur';
 
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
 import {ICON_GRAY, ICON_BLACK} from '@/constants/color';
 import {ListContainer} from '@/components/StyledContainer';
+import {ScreenHeight} from '@/constants/dimension';
 
 import {RootStackParamList} from '@/types';
 
@@ -26,9 +28,11 @@ const PlayerScreen = ({route}: Props) => {
   const [playerState, setPlayerState] = useState<State | null>(null);
   const {position, duration} = useProgress();
   const [currentQueue, setCurrentQueue] = useState<[] | Track[]>([]);
+  const [playlistVisible, setPlaylistVisible] = useState<boolean>(false);
   useEffect(() => {
     (async () => {
-      if (id) {
+      if (id && tracks.length) {
+        await TrackPlayer.reset();
         await TrackPlayer.add(tracks);
         const index = tracks.findIndex(item => item.id === id);
         await TrackPlayer.skip(index);
@@ -103,6 +107,17 @@ const PlayerScreen = ({route}: Props) => {
     }
   };
 
+  const togglePlaylist = () => {
+    setPlaylistVisible(true);
+  };
+
+  const handleSkipTrack = async (track: Track) => {
+    const index = currentQueue.findIndex(item => item.id === track.id);
+    await TrackPlayer.skip(index);
+    setCurrentTrack(track);
+    setPlaylistVisible(false);
+  };
+
   return (
     <SafeAreaView style={{justifyContent: 'space-between', alignItems: 'center', height: '100%'}}>
       <ListContainer style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -158,7 +173,12 @@ const PlayerScreen = ({route}: Props) => {
           color={ICON_BLACK}
           onPress={handleNext}
         />
-        <ClickButtonWithIcon size={30} icon="list-outline" color={ICON_GRAY} onPress={() => {}} />
+        <ClickButtonWithIcon
+          size={30}
+          icon="list-outline"
+          color={ICON_GRAY}
+          onPress={togglePlaylist}
+        />
       </ListContainer>
       <ListContainer
         style={{flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 25}}>
@@ -204,8 +224,69 @@ const PlayerScreen = ({route}: Props) => {
           onPress={() => {}}
         />
       </ListContainer>
+      <BottomSheet
+        modalProps={{}}
+        isVisible={playlistVisible}
+        // containerStyle={{height: 200, backgroundColor: 'red'}}
+        onBackdropPress={() => setPlaylistVisible(false)}>
+        <BlurView
+          blurType="dark"
+          blurAmount={10}
+          reducedTransparencyFallbackColor="black"
+          style={{width: '100%', height: ScreenHeight - 200}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              ...styles.playlistItemContainer,
+            }}>
+            <Text style={{color: 'white', fontSize: 16}}>顺序播放({currentQueue.length}首)</Text>
+          </View>
+          <ScrollView>
+            {currentQueue.map((track, i) => (
+              <ListItem
+                key={i}
+                onPress={() => handleSkipTrack(track)}
+                containerStyle={{
+                  backgroundColor: 'rgba(0, 0, 0, 0)',
+                  ...styles.playlistItemContainer,
+                }}>
+                <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <ListItem.Title style={{color: 'white', fontSize: 14, flex: 1}}>
+                    {track.title}
+                    <Text
+                      style={{
+                        color: 'rgba(244, 244, 244, 0.6)',
+                        fontSize: 12,
+                      }}>{`(${track.artist})`}</Text>
+                  </ListItem.Title>
+                  <ClickButtonWithIcon
+                    size={20}
+                    icon="close-outline"
+                    color="white"
+                    onPress={() => {}}
+                  />
+                </ListItem.Content>
+              </ListItem>
+            ))}
+          </ScrollView>
+          <View style={{height: 100, justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{color: 'white', fontSize: 16}}>关闭</Text>
+          </View>
+        </BlurView>
+      </BottomSheet>
     </SafeAreaView>
   );
 };
 
 export default PlayerScreen;
+
+const styles = StyleSheet.create({
+  playlistItemContainer: {
+    height: 50,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(244, 244, 244, 0.2)',
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+});
