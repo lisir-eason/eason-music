@@ -15,6 +15,7 @@ import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
 import {ICON_GRAY, ICON_BLACK} from '@/constants/color';
 import {ListContainer} from '@/components/StyledContainer';
 import {ScreenHeight} from '@/constants/dimension';
+import {MAIN_COLOR} from '@/constants/color';
 
 import {RootStackParamList} from '@/types';
 
@@ -257,13 +258,15 @@ const PlayerScreen = ({route, navigation}: Props) => {
                   ...styles.playlistItemContainer,
                 }}>
                 <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <ListItem.Title style={{color: 'white', fontSize: 14, flex: 1}}>
+                  <ListItem.Title
+                    style={
+                      track.url === currentTrack?.url ? styles.activeTitle : styles.normalTitle
+                    }>
                     {track.title}
                     <Text
-                      style={{
-                        color: 'rgba(244, 244, 244, 0.6)',
-                        fontSize: 12,
-                      }}>{`(${track.artist})`}</Text>
+                      style={
+                        track.url === currentTrack?.url ? styles.activeArtist : styles.normalArtist
+                      }>{`(${track.artist})`}</Text>
                   </ListItem.Title>
                   <ClickButtonWithIcon
                     size={20}
@@ -293,5 +296,23 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(244, 244, 244, 0.2)',
     paddingLeft: 20,
     paddingRight: 20,
+  },
+  normalTitle: {
+    color: 'white',
+    fontSize: 14,
+    flex: 1,
+  },
+  activeTitle: {
+    color: MAIN_COLOR,
+    fontSize: 14,
+    flex: 1,
+  },
+  normalArtist: {
+    color: 'rgba(244, 244, 244, 0.6)',
+    fontSize: 12,
+  },
+  activeArtist: {
+    color: MAIN_COLOR,
+    fontSize: 12,
   },
 });
