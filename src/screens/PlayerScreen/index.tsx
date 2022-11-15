@@ -7,6 +7,7 @@ import TrackPlayer, {
   Event,
   State,
   useProgress,
+  RepeatMode,
 } from 'react-native-track-player';
 import {LinearProgress, BottomSheet, ListItem, Image} from '@rneui/themed';
 import {BlurView} from '@react-native-community/blur';
@@ -23,6 +24,12 @@ type Props = {} & NativeStackScreenProps<RootStackParamList, 'Player'>;
 
 const events = [Event.PlaybackState, Event.PlaybackError, Event.PlaybackTrackChanged];
 
+const repeatModeMap = {
+  [RepeatMode.Off]: 'shuffle-outline',
+  [RepeatMode.Track]: 'sync-outline',
+  [RepeatMode.Queue]: 'repeat-outline',
+};
+
 const PlayerScreen = ({route, navigation}: Props) => {
   const {id, tracks} = route.params;
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -30,6 +37,7 @@ const PlayerScreen = ({route, navigation}: Props) => {
   const {position, duration} = useProgress();
   const [currentQueue, setCurrentQueue] = useState<[] | Track[]>([]);
   const [playlistVisible, setPlaylistVisible] = useState<boolean>(false);
+  const [repeatMode, setRepeatMode] = useState(RepeatMode.Off);
   useEffect(() => {
     (async () => {
       if (id && tracks.length) {
@@ -41,8 +49,10 @@ const PlayerScreen = ({route, navigation}: Props) => {
           const nowTrack = await TrackPlayer.getTrack(index);
           await TrackPlayer.play();
           const queue = await TrackPlayer.getQueue();
+          const mode = await TrackPlayer.getRepeatMode();
           setCurrentQueue(queue);
           setCurrentTrack(nowTrack);
+          setRepeatMode(mode);
         } catch (error) {
           console.error(error);
         }
@@ -123,6 +133,15 @@ const PlayerScreen = ({route, navigation}: Props) => {
     setPlaylistVisible(false);
   };
 
+  const changeRepeatMode = async () => {
+    const repeat = await TrackPlayer.getRepeatMode();
+    console.log(repeat);
+    const repeatModeList = [RepeatMode.Off, RepeatMode.Track, RepeatMode.Queue];
+    const nextRepeatMode = repeatModeList[(repeat + 1) % 3];
+    await TrackPlayer.setRepeatMode(nextRepeatMode);
+    setRepeatMode(nextRepeatMode);
+  };
+
   return (
     <SafeAreaView style={{justifyContent: 'space-between', alignItems: 'center', height: '100%'}}>
       <ListContainer style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -161,7 +180,12 @@ const PlayerScreen = ({route, navigation}: Props) => {
           marginTop: 30,
           marginBottom: 30,
         }}>
-        <ClickButtonWithIcon size={30} icon="repeat-outline" color={ICON_GRAY} onPress={() => {}} />
+        <ClickButtonWithIcon
+          size={30}
+          icon={repeatModeMap[repeatMode]}
+          color={ICON_GRAY}
+          onPress={changeRepeatMode}
+        />
         <ClickButtonWithIcon
           size={25}
           icon="play-skip-back-outline"
@@ -266,7 +290,9 @@ const PlayerScreen = ({route, navigation}: Props) => {
                     <Text
                       style={
                         track.url === currentTrack?.url ? styles.activeArtist : styles.normalArtist
-                      }>{`(${track.artist})`}</Text>
+                      }>
+                      {`(${track.artist})`}
+                    </Text>
                   </ListItem.Title>
                   <ClickButtonWithIcon
                     size={20}
