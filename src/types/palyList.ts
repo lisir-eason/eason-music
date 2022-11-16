@@ -1,4 +1,4 @@
-export type playList = {
+export type PlayList = {
   id: string;
   name: string;
   picUrl: string;

@@ -1,6 +1,6 @@
 import {Animated} from 'react-native';
 
-export type animatedScroll = {
+export type AnimatedScroll = {
   animHeaderValue: Animated.Value;
   maxHeaderHeight: number;
 };

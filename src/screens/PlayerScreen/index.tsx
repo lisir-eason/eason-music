@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {View, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, SafeAreaView} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
 import TrackPlayer, {
   type Track,
@@ -9,14 +9,14 @@ import TrackPlayer, {
   useProgress,
   RepeatMode,
 } from 'react-native-track-player';
-import {LinearProgress, BottomSheet, ListItem, Image} from '@rneui/themed';
-import {BlurView} from '@react-native-community/blur';
+import {LinearProgress, Image} from '@rneui/themed';
 
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
 import {ICON_GRAY, ICON_BLACK} from '@/constants/color';
 import {ListContainer} from '@/components/StyledContainer';
-import {ScreenHeight} from '@/constants/dimension';
-import {MAIN_COLOR} from '@/constants/color';
+import PlaylistSheet from './PlaylistSheet';
+import LyricSheet from './LyricSheet';
+import {getLyricById} from '@/apis/song';
 
 import {RootStackParamList} from '@/types';
 
@@ -37,7 +37,9 @@ const PlayerScreen = ({route, navigation}: Props) => {
   const {position, duration} = useProgress();
   const [currentQueue, setCurrentQueue] = useState<[] | Track[]>([]);
   const [playlistVisible, setPlaylistVisible] = useState<boolean>(false);
+  const [lyricVisible, setLyricVisible] = useState<boolean>(false);
   const [repeatMode, setRepeatMode] = useState(RepeatMode.Off);
+  const [currentLyric, setCurrentLyric] = useState('');
   useEffect(() => {
     (async () => {
       if (id && tracks.length) {
@@ -59,6 +61,16 @@ const PlayerScreen = ({route, navigation}: Props) => {
       }
     })();
   }, [id, tracks]);
+
+  useEffect(() => {
+    if (currentTrack?.id) {
+      getLyricById(currentTrack.id).then(res => {
+        if (res) {
+          setCurrentLyric(res.data.lrc.lyric);
+        }
+      });
+    }
+  }, [currentTrack?.id]);
 
   useTrackPlayerEvents(events, async event => {
     if (event.type === Event.PlaybackError) {
@@ -250,95 +262,29 @@ const PlayerScreen = ({route, navigation}: Props) => {
         />
         <ClickButtonWithIcon
           size={30}
-          icon="ellipsis-horizontal-outline"
+          icon="list-circle-outline"
           color={ICON_GRAY}
-          onPress={() => {}}
+          onPress={() => {
+            setLyricVisible(true);
+          }}
         />
       </ListContainer>
-      <BottomSheet
-        modalProps={{}}
+      <PlaylistSheet
         isVisible={playlistVisible}
-        onBackdropPress={() => setPlaylistVisible(false)}>
-        <BlurView
-          blurType="dark"
-          blurAmount={10}
-          reducedTransparencyFallbackColor="black"
-          style={{width: '100%', height: ScreenHeight - 200}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              ...styles.playlistItemContainer,
-            }}>
-            <Text style={{color: 'white', fontSize: 16}}>顺序播放({currentQueue.length}首)</Text>
-          </View>
-          <ScrollView>
-            {currentQueue.map((track, i) => (
-              <ListItem
-                key={i}
-                onPress={() => handleSkipTrack(track)}
-                containerStyle={{
-                  backgroundColor: 'rgba(0, 0, 0, 0)',
-                  ...styles.playlistItemContainer,
-                }}>
-                <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <ListItem.Title
-                    style={
-                      track.url === currentTrack?.url ? styles.activeTitle : styles.normalTitle
-                    }>
-                    {track.title}
-                    <Text
-                      style={
-                        track.url === currentTrack?.url ? styles.activeArtist : styles.normalArtist
-                      }>
-                      {`(${track.artist})`}
-                    </Text>
-                  </ListItem.Title>
-                  <ClickButtonWithIcon
-                    size={20}
-                    icon="close-outline"
-                    color="white"
-                    onPress={() => {}}
-                  />
-                </ListItem.Content>
-              </ListItem>
-            ))}
-          </ScrollView>
-          <View style={{height: 100, justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{color: 'white', fontSize: 16}}>关闭</Text>
-          </View>
-        </BlurView>
-      </BottomSheet>
+        setPlaylistVisible={setPlaylistVisible}
+        currentTrack={currentTrack}
+        currentQueue={currentQueue}
+        handleSkipTrack={handleSkipTrack}
+      />
+      <LyricSheet
+        currentTrack={currentTrack}
+        isVisible={lyricVisible}
+        setVisible={setLyricVisible}
+        lyric={currentLyric}
+        position={position}
+      />
     </SafeAreaView>
   );
 };
 
 export default PlayerScreen;
-
-const styles = StyleSheet.create({
-  playlistItemContainer: {
-    height: 50,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(244, 244, 244, 0.2)',
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-  normalTitle: {
-    color: 'white',
-    fontSize: 14,
-    flex: 1,
-  },
-  activeTitle: {
-    color: MAIN_COLOR,
-    fontSize: 14,
-    flex: 1,
-  },
-  normalArtist: {
-    color: 'rgba(244, 244, 244, 0.6)',
-    fontSize: 12,
-  },
-  activeArtist: {
-    color: MAIN_COLOR,
-    fontSize: 12,
-  },
-});

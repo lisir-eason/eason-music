@@ -8000,6 +8000,11 @@
   "resolved" "https://registry.npmmirror.com/react-native-linear-gradient/-/react-native-linear-gradient-2.6.2.tgz"
   "version" "2.6.2"
 
+"react-native-lyric@^1.0.2":
+  "integrity" "sha512-gdzwFkwCkTiQ61/ileW1CVIP3G9pTzE48MNmn/Ltw+dXqakdYRTB9EVUhb6UWO6sWSFaTuGZXjapdwMo3Ss4qw=="
+  "resolved" "https://registry.npmmirror.com/react-native-lyric/-/react-native-lyric-1.0.2.tgz"
+  "version" "1.0.2"
+
 "react-native-ratings@^8.1.0":
   "integrity" "sha512-+QOJ4G3NjVkI1D+tk4EGx1dCvVfbD2nQdkrj9cXrcAoEiwmbep4z4bZbCKmWMpQ5h2dqbxABU8/eBnbDmvAc3g=="
   "resolved" "https://registry.npmmirror.com/react-native-ratings/-/react-native-ratings-8.1.0.tgz"

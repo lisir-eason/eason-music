@@ -1,10 +1,10 @@
-export type songLevel = 'standard' | 'higher' | 'exhigh' | 'lossless' | 'hires';
+export type SongLevel = 'standard' | 'higher' | 'exhigh' | 'lossless' | 'hires';
 
-export type songUrl = {
+export type SongUrl = {
   id: number;
   url: string;
   size: number;
   type: string;
-  level: songLevel;
+  level: SongLevel;
   time: number;
 };
