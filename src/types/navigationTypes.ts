@@ -1,6 +1,7 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps, NavigatorScreenParams} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {CustomTrack} from '@/types';
 
 export type MainTabParamList = {
   音乐: undefined;
@@ -9,19 +10,10 @@ export type MainTabParamList = {
   我的: undefined;
 };
 
-export type Tracks = {
-  id: number;
-  url: string;
-  title: string | undefined;
-  duration: number;
-  artist: string | undefined;
-  artwork: string | undefined;
-};
-
 export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList>;
   Playlist: {id: string};
-  Player: {id: number; tracks: Tracks[]};
+  Player: {id?: number; tracks?: CustomTrack[]} | undefined;
 };
 
 export type AllNavigationProps = CompositeScreenProps<

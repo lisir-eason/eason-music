@@ -6,6 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ButtonWithIcon from '@/components/ButtonWithIcon';
 import Playlist from '@/components/Playlist';
 import {getRecommendedPlaylist} from '@/apis/playlist';
+import PlayerBox from '@/components/PlayerBox';
 
 import {PlayList, AllNavigationProps} from '@/types';
 
@@ -37,44 +38,47 @@ const HomeScreen = ({navigation}: Props) => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={styles.header}>
-          <Text style={styles.logoText}>音乐</Text>
-          <View style={styles.searchBar}>
-            <SearchBar
-              placeholder="搜索"
-              platform="ios"
-              onChangeText={updateSearch}
-              value={search}
+    <>
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          <View style={styles.header}>
+            <Text style={styles.logoText}>音乐</Text>
+            <View style={styles.searchBar}>
+              <SearchBar
+                placeholder="搜索"
+                platform="ios"
+                onChangeText={updateSearch}
+                value={search}
+              />
+            </View>
+            <Ionicons name="fitness-outline" size={30} color="#000" />
+          </View>
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.homeImage}
+              source={{
+                uri: 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg',
+              }}
             />
           </View>
-          <Ionicons name="fitness-outline" size={30} color="#000" />
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.homeImage}
-            source={{
-              uri: 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg',
-            }}
-          />
-        </View>
-        <View style={styles.iconGroupList}>
-          <ButtonWithIcon title="歌单" icon="list-circle-outline" />
-          <ButtonWithIcon title="电台" icon="barcode-outline" />
-          <ButtonWithIcon title="排行榜" icon="stats-chart-outline" />
-          <ButtonWithIcon title="歌手" icon="people-outline" />
-          <ButtonWithIcon title="视频彩铃" icon="videocam-outline" />
-        </View>
-        <View style={styles.recommendedPlaylist}>
-          <View style={styles.recommendedPlaylistHeader}>
-            <Text style={{fontSize: 20, fontWeight: 'bold'}}>推荐歌单</Text>
-            <Text>更多 {'>'}</Text>
+          <View style={styles.iconGroupList}>
+            <ButtonWithIcon title="歌单" icon="list-circle-outline" />
+            <ButtonWithIcon title="电台" icon="barcode-outline" />
+            <ButtonWithIcon title="排行榜" icon="stats-chart-outline" />
+            <ButtonWithIcon title="歌手" icon="people-outline" />
+            <ButtonWithIcon title="视频彩铃" icon="videocam-outline" />
           </View>
-          <Playlist list={songList} navigation={navigation} />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <View style={styles.recommendedPlaylist}>
+            <View style={styles.recommendedPlaylistHeader}>
+              <Text style={{fontSize: 20, fontWeight: 'bold'}}>推荐歌单</Text>
+              <Text>更多 {'>'}</Text>
+            </View>
+            <Playlist list={songList} navigation={navigation} />
+          </View>
+        </ScrollView>
+        <PlayerBox />
+      </SafeAreaView>
+    </>
   );
 };
 

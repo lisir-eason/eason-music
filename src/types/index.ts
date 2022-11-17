@@ -1,4 +1,5 @@
-export type {PlayList} from './palyList';
-export type {MainTabParamList, RootStackParamList, AllNavigationProps, Tracks} from './navigation';
-export type {AnimatedScroll} from './animatedScroll';
-export type {SongLevel, SongUrl} from './song';
+export type {PlayList} from './palyListTypes';
+export type {MainTabParamList, RootStackParamList, AllNavigationProps} from './navigationTypes';
+export type {AnimatedScroll} from './animatedTypes';
+export type {SongLevel, SongUrl} from './songTypes';
+export type {CustomTrack} from './trackTypes';

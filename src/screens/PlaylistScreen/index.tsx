@@ -7,7 +7,7 @@ import HeaderChangeScrollView from '@/components/HeaderChangeScrollView';
 import {PlaylistInfoBox, ListContainer} from '@/components/StyledContainer';
 import {H2, H3} from '@/components/StyledComponent';
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
-import {RootStackParamList, SongUrl} from '@/types';
+import {RootStackParamList, SongUrl, CustomTrack} from '@/types';
 import {getPlaylistDetail} from '@/apis/playlist';
 import {getSongUrls} from '@/apis/song';
 import {ICON_GRAY} from '@/constants/color';
@@ -57,23 +57,23 @@ const PlaylistScreen = ({route, navigation}: Props) => {
         const tracksId = tracks.map(item => item.id).join(',');
         const {data: urls} = await getSongUrls({id: tracksId, level: 'standard'});
         const data = urls.data as SongUrl[];
-        const songTracks = data
+        const songTracks: CustomTrack[] = data
           .map(item => {
             return {
               id: item.id,
               url: (item.url && item.url.replace('http', 'https')) || '',
-              title: tracks.find(el => el.id === item.id)?.name,
+              title: tracks.find(el => el.id === item.id)?.name || '',
               duration: item.time / 1000,
-              artist: tracks
-                .find(el => el.id === item.id)
-                ?.ar.map(e => e.name)
-                ?.join(','),
-              artwork: tracks.find(el => el.id === item.id)?.al.picUrl.replace('http', 'https'),
+              artist:
+                tracks
+                  .find(el => el.id === item.id)
+                  ?.ar.map(e => e.name)
+                  ?.join(',') || '',
+              artwork:
+                tracks.find(el => el.id === item.id)?.al.picUrl.replace('http', 'https') || '',
             };
           })
           .filter(el => el.url);
-
-        console.log(songTracks);
         navigation.navigate('Player', {id: track.id, tracks: songTracks});
       } catch (error) {
         console.error(error);
@@ -164,7 +164,6 @@ const PlaylistScreen = ({route, navigation}: Props) => {
             <Image style={styles.playlistCoverImage} source={{uri: playlistInfo?.coverImgUrl}} />
           </PlaylistInfoBox>
           <ListContainer style={{marginTop: 290}}>
-            {/* <FlatList data={playlistInfo?.tracks} renderItem={renderItem} /> */}
             {playlistInfo?.tracks.length ? renderItem : renderSkeleton()}
           </ListContainer>
         </>

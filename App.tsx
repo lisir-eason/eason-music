@@ -3,11 +3,13 @@ import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TrackPlayer from 'react-native-track-player';
+import {Provider} from 'react-redux';
 
 import MainScreen from '@/screens/MainScreen';
 import PlaylistScreen from '@/screens/PlaylistScreen';
 import PlayerScreen from '@/screens/PlayerScreen';
 import {trackPlayerServices} from './service';
+import {store} from '@/store/index';
 
 import {RootStackParamList} from '@/types';
 
@@ -25,27 +27,29 @@ const App = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerTintColor: '#fff'}}>
-        <Stack.Screen name="Main" component={MainScreen} options={{headerShown: false}} />
-        <Stack.Screen
-          name="Playlist"
-          component={PlaylistScreen}
-          options={{
-            headerBackTitleVisible: false,
-            headerTitle: '',
-          }}
-        />
-        <Stack.Screen
-          name="Player"
-          component={PlayerScreen}
-          options={{
-            headerShown: false,
-            gestureDirection: 'vertical',
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerTintColor: '#fff'}}>
+          <Stack.Screen name="Main" component={MainScreen} options={{headerShown: false}} />
+          <Stack.Screen
+            name="Playlist"
+            component={PlaylistScreen}
+            options={{
+              headerBackTitleVisible: false,
+              headerTitle: '',
+            }}
+          />
+          <Stack.Screen
+            name="Player"
+            component={PlayerScreen}
+            options={{
+              headerShown: false,
+              gestureDirection: 'vertical',
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 };
 

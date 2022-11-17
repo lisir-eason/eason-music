@@ -3,18 +3,16 @@ import {BlurView} from '@react-native-community/blur';
 import {BottomSheet, Image} from '@rneui/themed';
 import {Pressable, Text, View} from 'react-native';
 import {Lyric, type LrcLine} from 'react-native-lyric';
-import {Track} from 'react-native-track-player';
+import {useProgress} from 'react-native-track-player';
 
 import {ScreenHeight} from '@/constants/dimension';
 import {MAIN_COLOR} from '@/constants/color';
 import {H3} from '@/components/StyledComponent';
+import {useAppSelector} from '@/hooks/ReduxToolkit';
 
 type Props = {
   isVisible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
-  lyric: string;
-  position: number;
-  currentTrack: null | Track;
 };
 
 type LyricProps = {
@@ -23,7 +21,10 @@ type LyricProps = {
   active: boolean;
 };
 
-const LyricSheet = ({isVisible, setVisible, lyric, position, currentTrack}: Props) => {
+const LyricSheet = ({isVisible, setVisible}: Props) => {
+  const lyric = useAppSelector(state => state.player.lyric);
+  const currentTrack = useAppSelector(state => state.player.currentTrack);
+  const {position} = useProgress();
   const lineRenderer = useCallback(
     ({lrcLine: {content}, active}: LyricProps) => (
       <View style={{height: '100%', alignItems: 'center'}}>

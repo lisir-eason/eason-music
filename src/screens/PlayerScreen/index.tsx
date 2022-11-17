@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react';
 import {View, Text, SafeAreaView} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
 import TrackPlayer, {
-  type Track,
   useTrackPlayerEvents,
   Event,
   State,
@@ -17,8 +16,15 @@ import {ListContainer} from '@/components/StyledContainer';
 import PlaylistSheet from './PlaylistSheet';
 import LyricSheet from './LyricSheet';
 import {getLyricById} from '@/apis/song';
-
-import {RootStackParamList} from '@/types';
+import {RootStackParamList, CustomTrack} from '@/types';
+import {
+  updateCurrentTrack,
+  updateCurrentQueue,
+  updateRepeatMode,
+  updateState,
+  updateLyric,
+} from '@/store/PlayerSlice';
+import {useAppDispatch, useAppSelector} from '@/hooks/ReduxToolkit';
 
 type Props = {} & NativeStackScreenProps<RootStackParamList, 'Player'>;
 
@@ -31,59 +37,60 @@ const repeatModeMap = {
 };
 
 const PlayerScreen = ({route, navigation}: Props) => {
-  const {id, tracks} = route.params;
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [playerState, setPlayerState] = useState<State | null>(null);
+  const id = route.params?.id;
+  const tracks = route.params?.tracks;
   const {position, duration} = useProgress();
-  const [currentQueue, setCurrentQueue] = useState<[] | Track[]>([]);
+  const currentTrack = useAppSelector(state => state.player.currentTrack);
+  const currentQueue = useAppSelector(state => state.player.currentQueue);
+  const playerState = useAppSelector(state => state.player.state);
+  const repeatMode = useAppSelector(state => state.player.repeatMode);
   const [playlistVisible, setPlaylistVisible] = useState<boolean>(false);
   const [lyricVisible, setLyricVisible] = useState<boolean>(false);
-  const [repeatMode, setRepeatMode] = useState(RepeatMode.Off);
-  const [currentLyric, setCurrentLyric] = useState('');
+  const dispatch = useAppDispatch();
   useEffect(() => {
     (async () => {
-      if (id && tracks.length) {
+      if (id && tracks?.length) {
         try {
           await TrackPlayer.reset();
           await TrackPlayer.add(tracks);
           const index = tracks.findIndex(item => item.id === id) || 0;
+          const track = tracks.find(item => item.id === id) || tracks[0];
           await TrackPlayer.skip(index);
-          const nowTrack = await TrackPlayer.getTrack(index);
           await TrackPlayer.play();
-          const queue = await TrackPlayer.getQueue();
           const mode = await TrackPlayer.getRepeatMode();
-          setCurrentQueue(queue);
-          setCurrentTrack(nowTrack);
-          setRepeatMode(mode);
+          dispatch(updateCurrentTrack(track));
+          dispatch(updateCurrentQueue(tracks));
+          dispatch(updateRepeatMode(mode));
         } catch (error) {
           console.error(error);
         }
       }
     })();
-  }, [id, tracks]);
+  }, [dispatch, id, tracks]);
 
   useEffect(() => {
     if (currentTrack?.id) {
       getLyricById(currentTrack.id).then(res => {
         if (res) {
-          setCurrentLyric(res.data.lrc.lyric);
+          dispatch(updateLyric(res.data.lrc.lyric));
         }
       });
     }
-  }, [currentTrack?.id]);
+  }, [currentTrack?.id, dispatch]);
 
   useTrackPlayerEvents(events, async event => {
     if (event.type === Event.PlaybackError) {
       console.warn('An error occur while playing the current track.');
     }
     if (event.type === Event.PlaybackState) {
-      setPlayerState(event.state);
+      dispatch(updateState(event.state));
     }
     if (event.type === Event.PlaybackTrackChanged) {
       const nowIndex = await TrackPlayer.getCurrentTrack();
       if (nowIndex !== null) {
         const nowTrack = await TrackPlayer.getTrack(nowIndex);
-        setCurrentTrack(nowTrack);
+        const track = currentQueue.find(item => item.url === nowTrack?.url) as CustomTrack;
+        dispatch(updateCurrentTrack(track));
       }
     }
   });
@@ -110,39 +117,34 @@ const PlayerScreen = ({route, navigation}: Props) => {
 
   const handlePrevious = async () => {
     const currentIndex = await TrackPlayer.getCurrentTrack();
-    if (currentIndex === 0 || currentIndex === null) {
+    if (currentIndex === null) {
       return;
     }
     await TrackPlayer.skipToPrevious();
     const nowIndex = await TrackPlayer.getCurrentTrack();
     if (nowIndex !== null) {
       const nowTrack = await TrackPlayer.getTrack(nowIndex);
-      setCurrentTrack(nowTrack);
+      const track = currentQueue.find(item => item.url === nowTrack?.url) as CustomTrack;
+      dispatch(updateCurrentTrack(track));
     }
   };
 
   const handleNext = async () => {
     const currentIndex = await TrackPlayer.getCurrentTrack();
-    if (currentIndex === currentQueue.length - 1 || currentIndex === null) {
+    if (currentIndex === null) {
       return;
     }
     await TrackPlayer.skipToNext();
     const nowIndex = await TrackPlayer.getCurrentTrack();
     if (nowIndex !== null) {
       const nowTrack = await TrackPlayer.getTrack(nowIndex);
-      setCurrentTrack(nowTrack);
+      const track = currentQueue.find(item => item.url === nowTrack?.url) as CustomTrack;
+      dispatch(updateCurrentTrack(track));
     }
   };
 
   const togglePlaylist = () => {
     setPlaylistVisible(true);
-  };
-
-  const handleSkipTrack = async (track: Track) => {
-    const index = currentQueue.findIndex(item => item.id === track.id);
-    await TrackPlayer.skip(index);
-    setCurrentTrack(track);
-    setPlaylistVisible(false);
   };
 
   const changeRepeatMode = async () => {
@@ -151,7 +153,7 @@ const PlayerScreen = ({route, navigation}: Props) => {
     const repeatModeList = [RepeatMode.Off, RepeatMode.Track, RepeatMode.Queue];
     const nextRepeatMode = repeatModeList[(repeat + 1) % 3];
     await TrackPlayer.setRepeatMode(nextRepeatMode);
-    setRepeatMode(nextRepeatMode);
+    dispatch(updateRepeatMode(nextRepeatMode));
   };
 
   return (
@@ -269,20 +271,8 @@ const PlayerScreen = ({route, navigation}: Props) => {
           }}
         />
       </ListContainer>
-      <PlaylistSheet
-        isVisible={playlistVisible}
-        setPlaylistVisible={setPlaylistVisible}
-        currentTrack={currentTrack}
-        currentQueue={currentQueue}
-        handleSkipTrack={handleSkipTrack}
-      />
-      <LyricSheet
-        currentTrack={currentTrack}
-        isVisible={lyricVisible}
-        setVisible={setLyricVisible}
-        lyric={currentLyric}
-        position={position}
-      />
+      <PlaylistSheet isVisible={playlistVisible} setPlaylistVisible={setPlaylistVisible} />
+      <LyricSheet isVisible={lyricVisible} setVisible={setLyricVisible} />
     </SafeAreaView>
   );
 };

@@ -2,27 +2,32 @@ import {type Dispatch, SetStateAction} from 'react';
 import {BottomSheet, ListItem} from '@rneui/themed';
 import {BlurView} from '@react-native-community/blur';
 import {StyleSheet, View, Text, ScrollView, Pressable} from 'react-native';
-import {type Track} from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
 
 import {ScreenHeight} from '@/constants/dimension';
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
 import {MAIN_COLOR} from '@/constants/color';
+import {CustomTrack} from '@/types';
+import {useAppSelector, useAppDispatch} from '@/hooks/ReduxToolkit';
+import {updateCurrentTrack} from '@/store/PlayerSlice';
 
 type Props = {
   isVisible: boolean;
   setPlaylistVisible: Dispatch<SetStateAction<boolean>>;
-  currentTrack: Track | null;
-  currentQueue: [] | Track[];
-  handleSkipTrack: (track: Track) => Promise<void>;
 };
 
-const PlaylistSheet = ({
-  isVisible,
-  setPlaylistVisible,
-  currentTrack,
-  currentQueue,
-  handleSkipTrack,
-}: Props) => {
+const PlaylistSheet = ({isVisible, setPlaylistVisible}: Props) => {
+  const currentTrack = useAppSelector(state => state.player.currentTrack);
+  const currentQueue = useAppSelector(state => state.player.currentQueue);
+  const dispatch = useAppDispatch();
+
+  const handleSkipTrack = async (track: CustomTrack) => {
+    const index = currentQueue.findIndex(item => item.id === track.id);
+    await TrackPlayer.skip(index);
+    dispatch(updateCurrentTrack(track));
+    setPlaylistVisible(false);
+  };
+
   return (
     <BottomSheet isVisible={isVisible} onBackdropPress={() => setPlaylistVisible(false)}>
       <BlurView
