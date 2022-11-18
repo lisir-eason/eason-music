@@ -1,33 +1,23 @@
-import React, {useEffect} from 'react';
-
+import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import TrackPlayer from 'react-native-track-player';
 import {Provider} from 'react-redux';
+import FlashMessage from 'react-native-flash-message';
 
 import MainScreen from '@/screens/MainScreen';
 import PlaylistScreen from '@/screens/PlaylistScreen';
 import PlayerScreen from '@/screens/PlayerScreen';
-import {trackPlayerServices} from './service';
 import {store} from '@/store/index';
+import InitPlayerConfig from '@/components/InitPlayerConfig';
 
 import {RootStackParamList} from '@/types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
-  useEffect(() => {
-    (async () => {
-      await TrackPlayer.setupPlayer().then(() => {
-        console.log('plyer is setup!');
-      });
-
-      TrackPlayer.registerPlaybackService(() => trackPlayerServices);
-    })();
-  }, []);
-
   return (
     <Provider store={store}>
+      <InitPlayerConfig />
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerTintColor: '#fff'}}>
           <Stack.Screen name="Main" component={MainScreen} options={{headerShown: false}} />
@@ -49,6 +39,7 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      <FlashMessage position="top" titleStyle={{color: '#fff', textAlign: 'center'}} />
     </Provider>
   );
 };

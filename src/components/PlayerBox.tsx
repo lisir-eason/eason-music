@@ -5,31 +5,27 @@ import {useNavigation} from '@react-navigation/native';
 
 import {MAIN_COLOR} from '@/constants/color';
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
-import {useAppSelector, useAppDispatch} from '@/hooks/ReduxToolkit';
-import {updateState} from '@/store/PlayerSlice';
+import {useAppSelector} from '@/hooks/ReduxToolkit';
 import {AllNavigationProps} from '@/types';
 
 const PlayerBox = () => {
   const currentTrack = useAppSelector(state => state.player.currentTrack);
   const playerState = useAppSelector(state => state.player.state);
-  const dispatch = useAppDispatch();
   const navigation = useNavigation<AllNavigationProps['navigation']>();
 
   const handlePlay = async () => {
-    if (!currentTrack?.url) {
+    if (!currentTrack) {
       return;
     }
     if (playerState === State.Playing) {
       await TrackPlayer.pause();
-      dispatch(updateState(State.Paused));
     } else {
       await TrackPlayer.play();
-      dispatch(updateState(State.Playing));
     }
   };
 
   const navigateToPlayerScreen = () => {
-    if (currentTrack?.url) {
+    if (currentTrack) {
       navigation.navigate('Player');
     }
   };
@@ -39,15 +35,13 @@ const PlayerBox = () => {
       <Image
         style={{width: 50, height: 50}}
         source={
-          currentTrack?.url
+          currentTrack
             ? {uri: currentTrack?.artwork as string | undefined}
             : require('../static/logo.png')
         }
       />
       <Text style={{flex: 1, color: '#fff', marginLeft: 10, marginRight: 10}}>
-        {currentTrack?.url
-          ? `${currentTrack?.title}-${currentTrack?.artist}`
-          : '听你喜欢听 (*╹▽╹*)'}
+        {currentTrack ? `${currentTrack?.title}-${currentTrack?.artist}` : '听你喜欢听 (*╹▽╹*)'}
       </Text>
       <ClickButtonWithIcon
         size={30}

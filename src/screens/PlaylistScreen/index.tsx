@@ -54,10 +54,15 @@ const PlaylistScreen = ({route, navigation}: Props) => {
     const tracks = playlistInfo?.tracks;
     if (tracks) {
       try {
-        const tracksId = tracks.map(item => item.id).join(',');
+        const trackIdList = tracks.map(item => item.id);
+        const tracksId = trackIdList.join(',');
         const {data: urls} = await getSongUrls({id: tracksId, level: 'standard'});
         const data = urls.data as SongUrl[];
-        const songTracks: CustomTrack[] = data
+        const result = trackIdList.map(item => {
+          return data.find(el => el.id === item) || data[0];
+        });
+
+        const songTracks: CustomTrack[] = result
           .map(item => {
             return {
               id: item.id,
@@ -161,7 +166,11 @@ const PlaylistScreen = ({route, navigation}: Props) => {
             ) : (
               <SkeletonWithLinear style={styles.leftInfoContainer} height={130} />
             )}
-            <Image style={styles.playlistCoverImage} source={{uri: playlistInfo?.coverImgUrl}} />
+            {playlistInfo?.tracks.length ? (
+              <Image style={styles.playlistCoverImage} source={{uri: playlistInfo?.coverImgUrl}} />
+            ) : (
+              <SkeletonWithLinear style={styles.playlistCoverImage} />
+            )}
           </PlaylistInfoBox>
           <ListContainer style={{marginTop: 290}}>
             {playlistInfo?.tracks.length ? renderItem : renderSkeleton()}

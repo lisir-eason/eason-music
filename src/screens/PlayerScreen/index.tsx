@@ -1,34 +1,21 @@
 import {useEffect, useState} from 'react';
 import {View, Text, SafeAreaView} from 'react-native';
 import {type NativeStackScreenProps} from '@react-navigation/native-stack';
-import TrackPlayer, {
-  useTrackPlayerEvents,
-  Event,
-  State,
-  useProgress,
-  RepeatMode,
-} from 'react-native-track-player';
+import TrackPlayer, {State, useProgress, RepeatMode} from 'react-native-track-player';
 import {LinearProgress, Image} from '@rneui/themed';
+import {showMessage} from 'react-native-flash-message';
 
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
 import {ICON_GRAY, ICON_BLACK} from '@/constants/color';
 import {ListContainer} from '@/components/StyledContainer';
-import PlaylistSheet from './PlaylistSheet';
+import PlaylistSheet, {modeMap} from './PlaylistSheet';
 import LyricSheet from './LyricSheet';
-import {getLyricById} from '@/apis/song';
-import {RootStackParamList, CustomTrack} from '@/types';
-import {
-  updateCurrentTrack,
-  updateCurrentQueue,
-  updateRepeatMode,
-  updateState,
-  updateLyric,
-} from '@/store/PlayerSlice';
+import {RootStackParamList} from '@/types';
+import {updateCurrentQueue, updateRepeatMode, updateCurrentTrack} from '@/store/PlayerSlice';
 import {useAppDispatch, useAppSelector} from '@/hooks/ReduxToolkit';
+import {MAIN_COLOR} from '../../constants/color';
 
 type Props = {} & NativeStackScreenProps<RootStackParamList, 'Player'>;
-
-const events = [Event.PlaybackState, Event.PlaybackError, Event.PlaybackTrackChanged];
 
 const repeatModeMap = {
   [RepeatMode.Off]: 'shuffle-outline',
@@ -53,13 +40,13 @@ const PlayerScreen = ({route, navigation}: Props) => {
         try {
           await TrackPlayer.reset();
           await TrackPlayer.add(tracks);
+          dispatch(updateCurrentQueue(tracks));
           const index = tracks.findIndex(item => item.id === id) || 0;
           const track = tracks.find(item => item.id === id) || tracks[0];
           await TrackPlayer.skip(index);
+          dispatch(updateCurrentTrack(track));
           await TrackPlayer.play();
           const mode = await TrackPlayer.getRepeatMode();
-          dispatch(updateCurrentTrack(track));
-          dispatch(updateCurrentQueue(tracks));
           dispatch(updateRepeatMode(mode));
         } catch (error) {
           console.error(error);
@@ -67,33 +54,6 @@ const PlayerScreen = ({route, navigation}: Props) => {
       }
     })();
   }, [dispatch, id, tracks]);
-
-  useEffect(() => {
-    if (currentTrack?.id) {
-      getLyricById(currentTrack.id).then(res => {
-        if (res) {
-          dispatch(updateLyric(res.data.lrc.lyric));
-        }
-      });
-    }
-  }, [currentTrack?.id, dispatch]);
-
-  useTrackPlayerEvents(events, async event => {
-    if (event.type === Event.PlaybackError) {
-      console.warn('An error occur while playing the current track.');
-    }
-    if (event.type === Event.PlaybackState) {
-      dispatch(updateState(event.state));
-    }
-    if (event.type === Event.PlaybackTrackChanged) {
-      const nowIndex = await TrackPlayer.getCurrentTrack();
-      if (nowIndex !== null) {
-        const nowTrack = await TrackPlayer.getTrack(nowIndex);
-        const track = currentQueue.find(item => item.url === nowTrack?.url) as CustomTrack;
-        dispatch(updateCurrentTrack(track));
-      }
-    }
-  });
 
   const convertTime = (second: number | undefined) => {
     if (!second) {
@@ -120,27 +80,33 @@ const PlayerScreen = ({route, navigation}: Props) => {
     if (currentIndex === null) {
       return;
     }
-    await TrackPlayer.skipToPrevious();
-    const nowIndex = await TrackPlayer.getCurrentTrack();
-    if (nowIndex !== null) {
-      const nowTrack = await TrackPlayer.getTrack(nowIndex);
-      const track = currentQueue.find(item => item.url === nowTrack?.url) as CustomTrack;
-      dispatch(updateCurrentTrack(track));
+    if (currentIndex === 0) {
+      showMessage({
+        message: '已经是第一首歌了!',
+        type: 'danger',
+      });
+      return;
     }
+    await TrackPlayer.skipToPrevious();
   };
 
   const handleNext = async () => {
     const currentIndex = await TrackPlayer.getCurrentTrack();
+    const currentModel = await TrackPlayer.getRepeatMode();
     if (currentIndex === null) {
       return;
     }
-    await TrackPlayer.skipToNext();
-    const nowIndex = await TrackPlayer.getCurrentTrack();
-    if (nowIndex !== null) {
-      const nowTrack = await TrackPlayer.getTrack(nowIndex);
-      const track = currentQueue.find(item => item.url === nowTrack?.url) as CustomTrack;
-      dispatch(updateCurrentTrack(track));
+    if (
+      currentIndex === currentQueue.length - 1 &&
+      (currentModel === RepeatMode.Off || currentModel === RepeatMode.Track)
+    ) {
+      showMessage({
+        message: '已经是最后一首歌了!',
+        type: 'danger',
+      });
+      return;
     }
+    await TrackPlayer.skipToNext();
   };
 
   const togglePlaylist = () => {
@@ -149,10 +115,14 @@ const PlayerScreen = ({route, navigation}: Props) => {
 
   const changeRepeatMode = async () => {
     const repeat = await TrackPlayer.getRepeatMode();
-    console.log(repeat);
     const repeatModeList = [RepeatMode.Off, RepeatMode.Track, RepeatMode.Queue];
     const nextRepeatMode = repeatModeList[(repeat + 1) % 3];
     await TrackPlayer.setRepeatMode(nextRepeatMode);
+    showMessage({
+      message: modeMap[nextRepeatMode],
+      type: 'info',
+      backgroundColor: MAIN_COLOR,
+    });
     dispatch(updateRepeatMode(nextRepeatMode));
   };
 

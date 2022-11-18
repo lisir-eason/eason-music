@@ -2,29 +2,33 @@ import {type Dispatch, SetStateAction} from 'react';
 import {BottomSheet, ListItem} from '@rneui/themed';
 import {BlurView} from '@react-native-community/blur';
 import {StyleSheet, View, Text, ScrollView, Pressable} from 'react-native';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, {RepeatMode} from 'react-native-track-player';
 
 import {ScreenHeight} from '@/constants/dimension';
 import ClickButtonWithIcon from '@/components/ClickButtonWithIcon';
 import {MAIN_COLOR} from '@/constants/color';
 import {CustomTrack} from '@/types';
-import {useAppSelector, useAppDispatch} from '@/hooks/ReduxToolkit';
-import {updateCurrentTrack} from '@/store/PlayerSlice';
+import {useAppSelector} from '@/hooks/ReduxToolkit';
 
 type Props = {
   isVisible: boolean;
   setPlaylistVisible: Dispatch<SetStateAction<boolean>>;
 };
 
+export const modeMap = {
+  [RepeatMode.Off]: '随机播放',
+  [RepeatMode.Queue]: '列表循环',
+  [RepeatMode.Track]: '单曲循环',
+};
+
 const PlaylistSheet = ({isVisible, setPlaylistVisible}: Props) => {
   const currentTrack = useAppSelector(state => state.player.currentTrack);
   const currentQueue = useAppSelector(state => state.player.currentQueue);
-  const dispatch = useAppDispatch();
+  const currentMode = useAppSelector(state => state.player.repeatMode);
 
   const handleSkipTrack = async (track: CustomTrack) => {
     const index = currentQueue.findIndex(item => item.id === track.id);
     await TrackPlayer.skip(index);
-    dispatch(updateCurrentTrack(track));
     setPlaylistVisible(false);
   };
 
@@ -41,7 +45,11 @@ const PlaylistSheet = ({isVisible, setPlaylistVisible}: Props) => {
             alignItems: 'center',
             ...styles.playlistItemContainer,
           }}>
-          <Text style={{color: 'white', fontSize: 16}}>顺序播放({currentQueue.length}首)</Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 16,
+            }}>{`${modeMap[currentMode]}(${currentQueue.length}首)`}</Text>
         </View>
         <ScrollView>
           {currentQueue.map((track, i) => (
