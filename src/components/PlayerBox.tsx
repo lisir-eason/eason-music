@@ -40,7 +40,7 @@ const PlayerBox = () => {
             : require('../static/logo.png')
         }
       />
-      <Text style={{flex: 1, color: '#fff', marginLeft: 10, marginRight: 10}}>
+      <Text numberOfLines={1} style={{flex: 1, color: '#fff', marginLeft: 10, marginRight: 10}}>
         {currentTrack ? `${currentTrack?.title}-${currentTrack?.artist}` : '听你喜欢听 (*╹▽╹*)'}
       </Text>
       <ClickButtonWithIcon

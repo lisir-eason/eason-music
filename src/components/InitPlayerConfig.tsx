@@ -5,7 +5,7 @@ import {showMessage} from 'react-native-flash-message';
 import {updateState, updateCurrentTrack, updateLyric} from '@/store/PlayerSlice';
 import {useAppDispatch, useAppSelector} from '@/hooks/ReduxToolkit';
 import {CustomTrack} from '@/types';
-import {getLyricById} from '@/apis/song';
+import {getLyricById} from '@/apis/songApi';
 
 const InitPlayerConfig = () => {
   const dispatch = useAppDispatch();
